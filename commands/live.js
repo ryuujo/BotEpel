@@ -56,12 +56,7 @@ module.exports = {
       const youtubeData = await fetchYoutube(youtubeId);
       const liveEmbed = {
         color: 0x1bdaff,
-        title: `Evelyn akan melakukan Livestream!`,
-        author: {
-          name: "Evelyn -Vtuber-",
-          icon_url: "https://yt3.ggpht.com/a/AATXAJxgPjxkVVGmmJBxMyajJqk57L9ySS4lBVqdEg=s288-c-k-c0xffffffff-no-rj-mo",
-          url: 'https://www.youtube.com/channel/UCMxxFFeuhFQ30quuePTym0A'
-        },
+        title: `Upcoming Livelyn`,
         thumbnail: {
           url: "https://yt3.ggpht.com/a/AATXAJxgPjxkVVGmmJBxMyajJqk57L9ySS4lBVqdEg=s288-c-k-c0xffffffff-no-rj-mo"
         },
@@ -86,8 +81,11 @@ module.exports = {
         }
       };
       const channel = message.guild.channels.get(textChannelID.live);
+      const roleId = message.guild.roles.find(
+        r => r.name === "Epelable"
+      );
       await channel.send(
-        `@everyone\nAku akan melakukan Livestream pada **${livestreamDateTime} WIB!** Ditonton ya...`,
+        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada upcoming Livelyn lhoooo jam **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
         { embed: liveEmbed }
       );
       return await message.reply(
