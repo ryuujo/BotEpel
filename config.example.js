@@ -3,7 +3,7 @@ module.exports = {
   token: "",
   roles: {
     admin: ["Moderator", "Owner"],
-    live: ["Moderator", "Member+", "Pawang BotCIA", "Owner"]
+    live: ["Moderator", "Member+", "Pawang Bot", "Owner"]
   },
   activity: "Use ? to start command",
   textChannelID: {
