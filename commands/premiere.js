@@ -6,15 +6,15 @@ const Vliver = require("../models").Vliver;
 const Schedule = require("../models").Schedule;
 
 module.exports = {
-  name: "live",
-  description: "Announces Upcoming live immediately",
+  name: "premiere",
+  description: "Announces Upcoming premiere immediately",
   args: true,
   async execute(message, args) {
     moment.locale("id");
     const messages =
       "Tulis formatnya seperti ini ya:\n> ```" +
       prefix +
-      "live [Tanggal Livestream (DD/MM)] [Waktu Livestream dalam WIB / GMT+7 (HH:MM)] [Link Video Youtube]```";
+      "premiere [Tanggal Premiere (DD/MM)] [Waktu Premiere dalam WIB / GMT+7 (HH:MM)] [Link Video Youtube]```";
 
     if (!message.member.roles.some(r => roles.live.includes(r.name))) {
       return message.reply("Kamu siapa ya?");
@@ -56,13 +56,13 @@ module.exports = {
       const youtubeData = await fetchYoutube(youtubeId);
       const liveEmbed = {
         color: 0x1bdaff,
-        title: `Upcoming Livelyn`,
+        title: `Video baru Epel`,
         thumbnail: {
           url: "https://yt3.ggpht.com/a/AATXAJxgPjxkVVGmmJBxMyajJqk57L9ySS4lBVqdEg=s288-c-k-c0xffffffff-no-rj-mo"
         },
         fields: [
           {
-            name: "Tanggal & Waktu Livestream",
+            name: "Tanggal & Waktu Premiere",
             value: `${livestreamDateTime} GMT+7 / WIB`
           },
           {
@@ -70,7 +70,7 @@ module.exports = {
             value: youtubeData.url
           },
           {
-            name: "Judul Live",
+            name: "Judul Video",
             value: youtubeData.title
           }
         ],
@@ -85,11 +85,11 @@ module.exports = {
         r => r.name === "Epelable"
       );
       await channel.send(
-        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada upcoming Livelyn lhoooo pada **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
+        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada video baru yang akan premiere lhoooo pada **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
         { embed: liveEmbed }
       );
       return await message.reply(
-        `Informasi live sudah dikirim ke text channel tujuan. Judul Livestream: ${youtubeData.title}\nJadwal live: ${livestreamDateTime} WIB / GMT+7`
+        `Informasi live sudah dikirim ke text channel tujuan. Judul Premiere: ${youtubeData.title}\nJadwal live: ${livestreamDateTime} WIB / GMT+7`
       );
     } catch (err) {
       message.reply(
