@@ -85,7 +85,7 @@ module.exports = {
         r => r.name === "Epelable"
       );
       await channel.send(
-        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada video baru yang akan premiere lhoooo pada **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
+        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nAkan ada premiere lhooo~ **${livestreamDateTime} WIB!**\nYuk nonton bareng Epel~!`,
         { embed: liveEmbed }
       );
       return await message.reply(
