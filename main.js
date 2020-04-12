@@ -42,7 +42,7 @@ client.once("ready", () => {
     .catch(err => {
       console.error("Unable to connect to the database:", err);
     });
-  console.log("BotCIA version: " + version + " is ready and active!");
+  console.log("BotEpel version: " + version + " is ready and active!");
   console.log(
     "My Active Time was at " + moment().format("dddd DD MMMM YYYY HH:mm:ss Z")
   );

@@ -5,7 +5,7 @@ module.exports = {
   description: "Prune up to 99 messages.",
   execute(message, args) {
     if (!message.member.roles.some(r => roles.admin.includes(r.name))) {
-      return message.reply("", { file: "https://i.imgur.com/4YNSGmG.jpg" });
+      return message.reply("Kamu siapa ya?");
     }
     const amount = parseInt(args[0]) + 1;
     if (isNaN(amount)) {
