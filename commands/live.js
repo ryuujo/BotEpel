@@ -17,7 +17,7 @@ module.exports = {
       "live [Tanggal Livestream (DD/MM)] [Waktu Livestream dalam WIB / GMT+7 (HH:MM)] [Link Video Youtube]```";
 
     if (!message.member.roles.some(r => roles.live.includes(r.name))) {
-      return message.reply("Kamu siapa ya?");
+      return message.reply("Waduh, Kamu siapa ya?");
     }
     if (args.length !== 3) {
       return message.reply(messages);
