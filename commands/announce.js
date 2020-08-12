@@ -6,34 +6,40 @@ const Vliver = require('../models').Vliver;
 const Schedule = require('../models').Schedule;
 
 module.exports = {
-  name: 'live',
-  description: 'Announces Upcoming live immediately',
+  name: 'announce',
+  description: 'Announces Upcoming live and premiere immediately',
   args: true,
   async execute(message, args) {
     moment.locale('id');
     const messages =
       'Tulis formatnya seperti ini ya:\n> ```' +
       prefix +
-      'live [Tanggal Livestream (DD/MM)] [Waktu Livestream dalam WIB / GMT+7 (HH:MM)] [Link Video Youtube]```';
+      'announce [live/premiere] [Link Video Youtube]```';
 
     if (!message.member.roles.some((r) => roles.live.includes(r.name))) {
       return message.reply('Waduh, Kamu siapa ya?');
     }
-    if (args.length !== 3) {
+    if (args.length !== 2) {
+      return message.reply(messages);
+    }
+    if (
+      args[0].toLowerCase() !== 'live' &&
+      args[0].toLowerCase() !== 'premiere'
+    ) {
       return message.reply(messages);
     }
     message.channel.send(
       'Mohon tunggu, sedang menyiapkan data untuk dikirimkan'
     );
     const timeFormat = 'Do MMMM YYYY, HH:mm';
-    const dateSplit = args[0].split('/');
+    /* const dateSplit = args[0].split('/');
     const date =
       dateSplit[1] + '/' + dateSplit[0] + '/' + moment().format('YYYY');
     const dateTime = Date.parse(`${date} ${args[1]}`);
     const livestreamDateTime = moment(dateTime)
       .utcOffset('+07:00')
-      .format(timeFormat);
-    const linkData = args[2].split('/');
+      .format(timeFormat); */
+    const linkData = args[1].split('/');
     let youtubeId;
     if (linkData[0] !== 'https:' || linkData[3] === '') {
       return message.reply(messages);
@@ -61,6 +67,11 @@ module.exports = {
       };
       const youtubeData = await youtube.videos.list(config);
       const youtubeInfo = youtubeData.data.items[0].snippet;
+      const youtubeLive = youtubeData.data.items[0].liveStreamingDetails;
+      const videoDateTime = moment(youtubeLive.scheduledStartTime)
+        .utcOffset('+07:00')
+        .format(timeFormat);
+
       const liveEmbed = {
         color: 0x1bdaff,
         title: `Upcoming Livelyn`,
@@ -70,15 +81,19 @@ module.exports = {
         },
         fields: [
           {
-            name: 'Tanggal & Waktu Livestream',
-            value: `${livestreamDateTime} GMT+7 / WIB`,
+            name: `Tanggal & Waktu ${
+              args[0].toLowerCase() === 'live' ? 'live' : 'premiere'
+            }`,
+            value: `${videoDateTime} UTC+7 / WIB`,
           },
           {
             name: 'Link Video Youtube',
             value: `https://www.youtube.com/watch?v=${youtubeId}`,
           },
           {
-            name: 'Judul Live',
+            name: `Judul ${
+              args[0].toLowerCase() === 'live' ? 'Live' : 'Video'
+            }`,
             value: youtubeInfo.title,
           },
         ],
@@ -94,11 +109,17 @@ module.exports = {
       const channel = message.guild.channels.get(textChannelID.live);
       const roleId = message.guild.roles.find((r) => r.name === 'Epelable');
       await channel.send(
-        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada upcoming Livelyn lhoooo pada **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
+        `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \n${
+          args[0].toLowerCase() === 'live'
+            ? `Bakal ada upcoming Livelyn lhoooo pada **${videoDateTime} WIB!**\nDateng yaaa~ UwU`
+            : `Akan ada premiere lhooo~ pada **${videoDateTime} WIB!**\nYuk nonton bareng Epel~!`
+        }`,
         { embed: liveEmbed }
       );
       return await message.reply(
-        `Informasi live sudah dikirim ke text channel tujuan.\nJudul Livestream: ${youtubeInfo.title}\nJadwal live: ${livestreamDateTime} WIB / GMT+7`
+        `Informasi ${args[0].toLowerCase()} sudah dikirim ke text channel tujuan.\nJudul ${args[0].toLowerCase() === 'live'? 'Livestream' : 'Video'}: ${
+          youtubeInfo.title
+        }\nJadwal ${args[0].toLowerCase() === 'live'? 'Livestream' : 'Premiere'}: ${videoDateTime} WIB / GMT+7`
       );
     } catch (err) {
       message.reply(

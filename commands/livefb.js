@@ -1,23 +1,21 @@
 const moment = require('moment');
 const { name, version } = require('../package.json');
 const { roles, textChannelID, prefix } = require('../config.js');
-const { youtube } = require('../config/youtube');
 const Vliver = require('../models').Vliver;
 const Schedule = require('../models').Schedule;
 
 module.exports = {
-  name: 'live',
-  description: 'Announces Upcoming live immediately',
+  name: 'livefb',
+  description: 'Announces upcoming live immediately on Facebook',
   args: true,
   async execute(message, args) {
     moment.locale('id');
     const messages =
       'Tulis formatnya seperti ini ya:\n> ```' +
       prefix +
-      'live [Tanggal Livestream (DD/MM)] [Waktu Livestream dalam WIB / GMT+7 (HH:MM)] [Link Video Youtube]```';
-
+      'live [Tanggal Livestream (DD/MM)] [Waktu Livestream dalam WIB / GMT+7 (HH:MM)] [Link Video Facebook]```';
     if (!message.member.roles.some((r) => roles.live.includes(r.name))) {
-      return message.reply('Waduh, Kamu siapa ya?');
+      return message.reply('Waduh, kamu siapa ya?');
     }
     if (args.length !== 3) {
       return message.reply(messages);
@@ -33,37 +31,17 @@ module.exports = {
     const livestreamDateTime = moment(dateTime)
       .utcOffset('+07:00')
       .format(timeFormat);
+    const livestreamDateTimeJapan = moment(dateTime)
+      .utcOffset('+09:00')
+      .format(timeFormat);
     const linkData = args[2].split('/');
-    let youtubeId;
     if (linkData[0] !== 'https:' || linkData[3] === '') {
       return message.reply(messages);
     }
-    switch (linkData[2]) {
-      case 'www.youtube.com':
-        const paramData = linkData[3].split('=');
-        youtubeId = paramData[1].split('&', 1)[0];
-        break;
-      case 'youtu.be':
-        youtubeId = linkData[3];
-        break;
-      default:
-        return message.reply(messages);
-    }
-    if (youtubeId === undefined) {
-      return message.reply(messages);
-    }
     try {
-      const config = {
-        id: youtubeId,
-        part: 'snippet,liveStreamingDetails',
-        fields:
-          'pageInfo,items(snippet(title,thumbnails/standard/url),liveStreamingDetails)',
-      };
-      const youtubeData = await youtube.videos.list(config);
-      const youtubeInfo = youtubeData.data.items[0].snippet;
       const liveEmbed = {
         color: 0x1bdaff,
-        title: `Upcoming Livelyn`,
+        title: `Upcoming Livelyn di Facebook`,
         thumbnail: {
           url:
             'https://yt3.ggpht.com/a/AATXAJxgPjxkVVGmmJBxMyajJqk57L9ySS4lBVqdEg=s288-c-k-c0xffffffff-no-rj-mo',
@@ -71,20 +49,13 @@ module.exports = {
         fields: [
           {
             name: 'Tanggal & Waktu Livestream',
-            value: `${livestreamDateTime} GMT+7 / WIB`,
+            value: `${livestreamDateTime} GMT+7 / WIB \n${livestreamDateTimeJapan} GMT+9 / JST`,
           },
           {
-            name: 'Link Video Youtube',
-            value: `https://www.youtube.com/watch?v=${youtubeId}`,
-          },
-          {
-            name: 'Judul Live',
-            value: youtubeInfo.title,
+            name: 'Link Video Facebook',
+            value: args[2],
           },
         ],
-        image: {
-          url: youtubeInfo.thumbnails.standard.url,
-        },
         footer: {
           text: `${name} v${version} - This message was created on ${moment()
             .utcOffset('+07:00')
@@ -92,13 +63,15 @@ module.exports = {
         },
       };
       const channel = message.guild.channels.get(textChannelID.live);
-      const roleId = message.guild.roles.find((r) => r.name === 'Epelable');
+      const roleId = message.guild.roles.find(
+        r => r.name === "Epelable"
+      );
       await channel.send(
         `Hai Halo~ <@&${roleId.id}> people ヾ(＾-＾)ノ \nBakal ada upcoming Livelyn lhoooo pada **${livestreamDateTime} WIB!**\nDateng yaaa~ UwU`,
         { embed: liveEmbed }
       );
       return await message.reply(
-        `Informasi live sudah dikirim ke text channel tujuan.\nJudul Livestream: ${youtubeInfo.title}\nJadwal live: ${livestreamDateTime} WIB / GMT+7`
+        `Informasi live FB sudah dikirim ke text channel tujuan.\nJadwal live: ${livestreamDateTime} WIB / GMT+7`
       );
     } catch (err) {
       message.reply(

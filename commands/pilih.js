@@ -30,7 +30,7 @@ module.exports = {
         case 10:
           return message.channel.send("Aku gak pilih keduanya");
         case 11:
-          return message.channel.send("Aku pilihnya kamu aja *wink*");
+          return message.channel.send("Aku pilihnya kamu aja *huhihuhihuhi*");
       }
     } else {
       message.reply(

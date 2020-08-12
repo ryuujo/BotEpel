@@ -127,9 +127,7 @@ module.exports = {
               tag.createdBy !==
               message.author.username + '#' + message.author.discriminator
             ) {
-              return message.reply('', {
-                file: 'https://i.imgur.com/4YNSGmG.jpg',
-              });
+              return message.reply('Waduh, kamu siapa ya?');
             }
             tag.response = args.slice(2, args.length).join(' ');
             tag.updatedBy =
@@ -163,9 +161,7 @@ module.exports = {
                   'Tag `' + args[1] + '` berhasil dihapus'
                 );
               } else {
-                return message.reply('', {
-                  file: 'https://i.imgur.com/4YNSGmG.jpg',
-                });
+                return message.reply('Waduh, kamu siapa ya?');
               }
             } else {
               return message.channel.send(
@@ -223,6 +219,30 @@ module.exports = {
           return message.channel.send(help);
         case 'tags':
           return message.channel.send('Gunakan perintah `!!tags` saja');
+        case 'rank':
+          try {
+            const tags = await Tag.findAll({
+              order: [['count', 'DESC']],
+            });
+            const rank = tags.slice(0, 10);
+            const rankEmbed = {
+              title: 'Top 10 Most Used Tags',
+              description: rank
+                .map(
+                  (r, i) =>
+                    `${i + 1}. **${r.command}** - Created by **${
+                      r.createdBy
+                    }**\nUsed **${r.count}** times`
+                )
+                .join('\n\n'),
+            };
+            return message.channel.send({ embed: rankEmbed });
+          } catch (err) {
+            console.log(err);
+            return message.reply(
+              'Ada sesuatu yang salah tapi itu bukan kamu: ' + err.message
+            );
+          }
         default:
           try {
             const tag = await Tag.findOne({ where: { command: args[0] } });

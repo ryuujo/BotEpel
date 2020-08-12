@@ -1,12 +1,13 @@
 module.exports = {
-  prefix: "?",
-  token: "",
+  prefix: '?',
+  token: '',
   roles: {
-    admin: ["Moderator", "Owner"],
-    live: ["Moderator", "Member+", "Pawang Bot", "Owner"]
+    admin: ['Moderator', 'Owner'],
+    live: ['Moderator', 'Member+', 'Pawang Bot', 'Owner'],
   },
-  activity: "Use ? to start command",
+  activity: 'Use ? to start command',
   textChannelID: {
-    live: ""
-  }
+    live: '',
+  },
+  googleApi: '',
 };
