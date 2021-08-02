@@ -76,7 +76,7 @@ module.exports = {
         id: youtubeId,
         part: 'snippet,liveStreamingDetails',
         fields:
-          'pageInfo,items(snippet(title,thumbnails/standard/url,channelTitle,channelId),liveStreamingDetails)',
+          'pageInfo,items(snippet(title,thumbnails/high/url,channelTitle,channelId),liveStreamingDetails)',
       };
       const youtubeData = await youtube.videos.list(config);
       const youtubeInfo = youtubeData.data.items[0].snippet;
@@ -100,7 +100,7 @@ module.exports = {
         dateTime: new Date(videoDateTime.format(timeForDB)),
         vtuberId: vData.dataValues.id,
         type: args[0].toLowerCase(),
-        thumbnailUrl: youtubeInfo.thumbnails.standard.url,
+        thumbnailUrl: youtubeInfo.thumbnails.high.url,
       });
       const liveEmbed = {
         color: parseInt(vData.dataValues.color),
@@ -136,7 +136,7 @@ module.exports = {
           },
         ],
         image: {
-          url: youtubeInfo.thumbnails.standard.url,
+          url: youtubeInfo.thumbnails.high.url,
         },
         footer: {
           text: `${name} v${version} - This message was created on ${moment()
