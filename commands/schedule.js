@@ -1,31 +1,25 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const Schedule = require('../models').Schedule;
+const Vtuber = require('../models').Vtuber
 const { name, version } = require('../package.json');
 
 module.exports = {
   name: 'schedule',
   description: 'Check upcoming schedule',
-  async execute(message) {
+  async execute(message, args) {
     moment.locale('id');
     const timeFormat = 'Do MMMM YYYY, HH:mm';
-    try {
-      const data = await Schedule.findAll({
-        where: {
-          dateTime: {
-            [Op.gt]: new Date().setMinutes(new Date().getMinutes() - 30),
-          },
-        },
-        order: [
-          ['dateTime', 'ASC'],
-          ['id', 'ASC'],
-        ],
-        raw: true,
-        include: 'vtuber',
-      });
-      const liveEmbed = {
+
+    const scheduleEmbed = (data, vtuberName, avatar) => {
+      const embed = {
         color: parseInt(data.length !== 0 ? data[0]['vtuber.color'] : ''),
-        title: 'Upcoming Stream',
+        title: vtuberName
+          ? `Upcoming stream dari ${vtuberName}`
+          : 'Upcoming Stream',
+        thumbnail: {
+          url: avatar,
+        },
         description:
           data.length !== 0
             ? `${data
@@ -55,10 +49,57 @@ module.exports = {
         },
       };
       return message.channel.send('List Stream/Premiere yang akan datang: ', {
-        embed: liveEmbed,
+        embed: embed,
       });
+    };
+
+    try {
+      if (!args[0]) {
+        const data = await Schedule.findAll({
+          where: {
+            dateTime: {
+              //[Op.gt]: new Date().setMinutes(new Date().getMinutes() - 30),
+              [Op.gt]: moment(),
+            },
+          },
+          order: [
+            ['dateTime', 'ASC'],
+            ['id', 'ASC'],
+          ],
+          raw: true,
+          include: 'vtuber',
+        });
+        return scheduleEmbed(data, null, null);
+      } else {
+        const vtuberFirstName = args[0].toLowerCase();
+        const vData = await Vtuber.findOne({
+          where: { name: vtuberFirstName },
+        });
+        if (!vData) {
+          throw {
+            message: `Kamu menginput ${vtuberFirstName} dan itu tidak ada di database kami`,
+          };
+        }
+        const data = await Schedule.findAll({
+          where: {
+            dateTime: {
+              [Op.gt]: new Date().setMinutes(new Date().getMinutes() - 30),
+            },
+            vtuberID: vData.id,
+          },
+          order: [
+            ['dateTime', 'ASC'],
+            ['id', 'ASC'],
+          ],
+          raw: true,
+          include: 'vtuber',
+        });
+        return scheduleEmbed(data, vData.fullName, vData.avatarURL);
+      }
     } catch (e) {
-      console.log(e);
+      return message.reply(
+        `Ada sesuatu yang salah, tapi itu bukan kamu: ${e.message}`
+      );
     }
   },
 };
