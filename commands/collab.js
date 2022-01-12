@@ -6,20 +6,20 @@ const Vtuber = require('../models').Vtuber;
 const Schedule = require('../models').Schedule;
 
 module.exports = {
-  name: 'announce',
-  description: 'Announces Upcoming live and premiere immediately',
+  name: 'collab',
+  description: 'Announces Upcoming live and premiere collab immediately',
   args: true,
   async execute(message, args) {
     moment.locale('id');
     const messages =
       'Tulis formatnya seperti ini ya:\n> ```' +
       prefix +
-      'announce [live/premiere] [Link Video Youtube]```';
+      'collab [live/premiere] [Vtuber Name] [Link Video Youtube]```';
 
     if (!message.member.roles.some((r) => roles.live.includes(r.name))) {
       return message.reply('Waduh, Kamu siapa ya?');
     }
-    if (args.length !== 2) {
+    if (args.length !== 3) {
       return message.reply(messages);
     }
     if (
@@ -31,6 +31,7 @@ module.exports = {
     message.channel.send(
       'Mohon tunggu, sedang menyiapkan data untuk dikirimkan'
     );
+    const vtuberFirstName = args[1].toLowerCase();
     const timeFormat = 'Do MMMM YYYY, HH:mm';
     const timeForDB = 'MM DD YYYY, HH:mm';
     /* const dateSplit = args[0].split('/');
@@ -40,7 +41,7 @@ module.exports = {
     const livestreamDateTime = moment(dateTime)
       .utcOffset('+07:00')
       .format(timeFormat); */
-    const linkData = args[1].split('/');
+    const linkData = args[2].split('/');
     let youtubeId;
     if (linkData[0] !== 'https:' || linkData[3] === '') {
       return message.reply(messages);
@@ -81,14 +82,22 @@ module.exports = {
       const youtubeData = await youtube.videos.list(config);
       const youtubeInfo = youtubeData.data.items[0].snippet;
       const youtubeLive = youtubeData.data.items[0].liveStreamingDetails;
-      const vData = await Vtuber.findOne({
+      const vFind = await Vtuber.findOne({
         where: {
           channelURL: `https://www.youtube.com/channel/${youtubeInfo.channelId}`,
         },
       });
+      if (vFind) {
+        throw {
+          message: `Channel ${youtubeInfo.channelTitle} sudah ada di database kami. Silahkan gunakan command \`!!announce\` Channel ID: ${youtubeInfo.channelId}`,
+        };
+      }
+      const vData = await Vtuber.findOne({
+        where: { name: vtuberFirstName },
+      });
       if (!vData) {
         throw {
-          message: `Channel ${youtubeInfo.channelTitle} tidak ada di database kami. Channel ID: ${youtubeInfo.channelId}`,
+          message: `Kamu menginput ${vtuberFirstName} dan itu tidak ada di database kami`,
         };
       }
       const videoDateTime = moment(youtubeLive.scheduledStartTime).utcOffset(
@@ -104,11 +113,9 @@ module.exports = {
       });
       const liveEmbed = {
         color: parseInt(vData.dataValues.color),
-        title: `${vData.dataValues.fullName} akan ${
-          args[0].toLowerCase() === 'live'
-            ? 'melakukan Livestream'
-            : 'mengupload video baru'
-        }!`,
+        title: `${vData.dataValues.fullName} akan hadir di ${
+          args[0].toLowerCase() === 'live' ? 'livestream' : 'video'
+        }nya ${youtubeInfo.channelTitle} !`,
         author: {
           name: vData.dataValues.fullName,
           icon_url: vData.dataValues.avatarURL,
@@ -161,10 +168,16 @@ module.exports = {
       await channel.send(
         `Hai Halo~ ${mention} people ヾ(＾-＾)ノ \n${
           args[0].toLowerCase() === 'live'
-            ? `Bakal ada Livestream mendatang lhoooo pada **${videoDateTime.format(
+            ? `**${vData.dataValues.fullName}** akan hadir di livestreamnya **${
+                youtubeInfo.channelTitle
+              }** pada **${videoDateTime.format(
                 timeFormat
               )} WIB!**\nDateng yaaa~ UwU`
-            : `Akan ada premiere lhooo~ pada **${videoDateTime.format(
+            : `**${
+                vData.dataValues.fullName
+              }** bakalan muncul di video barunya **${
+                youtubeInfo.channelTitle
+              }** lhooo~ pada **${videoDateTime.format(
                 timeFormat
               )} WIB!**\nNonton bareng yuk~!`
         }`,
