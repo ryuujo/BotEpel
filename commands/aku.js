@@ -5,7 +5,8 @@ module.exports = {
   description: 'Joke bapacc bapacc',
   execute(message, args) {
     if (args.length > 0) {
-      message.channel.send(`Halo ${args[0]}, aku BotEpel`);
+    const StringCoba = args;
+      message.channel.send(`Halo ${StringCoba}, aku BotEpel`);
       return;
     }
     return message.reply('Aku siapa?');
