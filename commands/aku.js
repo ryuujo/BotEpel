@@ -5,7 +5,7 @@ module.exports = {
   description: 'Joke bapacc bapacc',
   execute(message, args) {
     if (args.length > 0) {
-    const StringCoba = args;
+    const StringCoba = args.join(' ');
       message.channel.send(`Halo ${StringCoba}, aku BotEpel`);
       return;
     }
