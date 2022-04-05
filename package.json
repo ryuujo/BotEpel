@@ -1,6 +1,6 @@
 {
   "name": "bot-epel",
-  "version": "1.5.1-fork-seiso",
+  "version": "1.5.2-fork-seiso",
   "main": "main.js",
   "license": "MIT",
   "scripts": {
