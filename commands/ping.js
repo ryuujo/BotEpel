@@ -3,6 +3,6 @@ module.exports = {
   description: "Ping me if you or this bot feel laggy",
   execute(message, args) {
     const ping = resultMessage.createdTimestamp - message.createdTimestamp
-    message.channel.send('**Pong.** Aku di sini~\nBot latency: ${ping}, API Latency: ${client.ws.ping}');
+    message.channel.send('**Pong.** Aku di sini~');
   }
 };
