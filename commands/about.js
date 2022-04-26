@@ -9,7 +9,7 @@ module.exports = {
         name +
         " v" +
         version +
-        ". At your Service!\nMy master is: Ryuujo (https://github.com/ryuujo)```"
+        ". At your Service!\nMy master is: seiso-chan (https://github.com/seisochan)\nOriginally coded by Ryuujo```"
     );
   }
 };
